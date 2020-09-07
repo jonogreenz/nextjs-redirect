@@ -26,7 +26,7 @@ import redirect from 'nextjs-redirect'
 export default redirect('https://paypal.me/pablopunk/5')
 ```
 
-You can checkout this example live in [pablo.pink](https://pablo.pink)
+You can checkout this example live in [pablo.im](https://pablo.im)
 
 ### Status code (301, 302...)
 
