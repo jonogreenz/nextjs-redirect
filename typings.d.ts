@@ -8,6 +8,7 @@ declare const _default: (
   options?: {
     asUrl?: string
     statusCode?: number
+    passParams?: boolean
   }
 ) => {
   new (props: {} | Readonly<{}>): {

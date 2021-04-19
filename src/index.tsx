@@ -4,31 +4,48 @@ import Head from 'next/head'
 
 export default (
   redirectUrl: string,
-  options?: { asUrl?: string; statusCode?: number }
+  options?: { asUrl?: string; statusCode?: number, passParams?: boolean }
 ) =>
   class extends React.Component {
     // Redirects on the server side first if possible
-    static async getInitialProps({ res }) {
+    static async getInitialProps({ res, req }) {
       if (res?.writeHead) {
-        res.writeHead(options?.statusCode ?? 301, { Location: redirectUrl })
-        res.end()
+        if (req && req.url && options?.passParams && req.url.includes('?')) {
+					// Overwrite and pass params if any set
+          const params = req.url.substring(req.url.indexOf('?'));
+          const safeRedirectUrl = redirectUrl.substring(0, redirectUrl.indexOf('?'));
+
+          res.writeHead(options?.statusCode ?? 301, { Location: safeRedirectUrl + params });
+          res.end();
+        } else {
+          res.writeHead(options?.statusCode ?? 301, { Location: redirectUrl })
+          res.end()
+        }
       }
       return {}
     }
 
     // Redirects on the client with JavaScript if no server
     componentDidMount() {
+      let href = options?.asUrl ?? redirectUrl;
+      if (options?.passParams && window.location.href.includes('?')) {
+        const params = window.location.href.substring(window.location.href.indexOf('?'));
+        const safeRedirectUrl = href.substring(0, href.indexOf('?'));
+        href = safeRedirectUrl + params;
+      }
+
       if (options?.asUrl != null) {
-        Router.push(redirectUrl, options.asUrl, { shallow: true })
+        Router.push(redirectUrl, href, { shallow: true })
       } else if (redirectUrl[0] === '/') {
-        Router.push(redirectUrl)
+        Router.push(href)
       } else {
-        window.location.href = redirectUrl
+        window.location.href = href
       }
     }
 
     render() {
       const href = options?.asUrl ?? redirectUrl
+      // TODO: Non-js way of fetching query params from current url
 
       return (
         <>
