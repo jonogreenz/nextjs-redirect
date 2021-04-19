@@ -13,7 +13,11 @@ export default (
         if (req && req.url && options?.passParams && req.url.includes('?')) {
 					// Overwrite and pass params if any set
           const params = req.url.substring(req.url.indexOf('?'));
-          const safeRedirectUrl = redirectUrl.substring(0, redirectUrl.indexOf('?'));
+          const safeIndexOf = redirectUrl.indexOf('?');
+          const safeRedirectUrl = redirectUrl.substring(
+            0,
+            safeIndexOf !== -1 ? safeIndexOf : undefined
+          );
 
           res.writeHead(options?.statusCode ?? 301, { Location: safeRedirectUrl + params });
           res.end();
@@ -30,7 +34,11 @@ export default (
       let href = options?.asUrl ?? redirectUrl;
       if (options?.passParams && window.location.href.includes('?')) {
         const params = window.location.href.substring(window.location.href.indexOf('?'));
-        const safeRedirectUrl = href.substring(0, href.indexOf('?'));
+        const safeIndexOf = href.indexOf('?');
+        const safeRedirectUrl = href.substring(
+          0,
+          safeIndexOf !== -1 ? safeIndexOf : undefined
+        );
         href = safeRedirectUrl + params;
       }
 
